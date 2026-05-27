@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large raw source data (rebuilt by data-build/build.py)
+data-build/spc-raw.csv
+data-build/counties.csv
+public/data/*.gz
