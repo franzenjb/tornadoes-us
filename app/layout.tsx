@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "US Tornado Compendium · 1950–2023",
+  title: "US Tornado Compendium · 1950–2026",
   description:
-    "Interactive compendium of every recorded US tornado, 1950–2023. Filter by month, year, state, county, EF intensity, injuries, and deaths. Data: NOAA SPC.",
+    "Interactive compendium of every recorded US tornado, 1950–2026. Filter by month, year, state, county, EF intensity, injuries, and deaths. Data: NOAA SPC + NCEI Storm Events.",
 };
 
 export default function RootLayout({

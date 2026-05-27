@@ -30,7 +30,7 @@ type DataState = {
   load: () => Promise<void>;
 };
 
-const defaultFilters = (yMin = 1950, yMax = 2023): Filters => ({
+const defaultFilters = (yMin = 1950, yMax = 2026): Filters => ({
   months: [],
   yearMin: yMin,
   yearMax: yMax,

@@ -44,7 +44,7 @@ export default function Home() {
               US Tornado Compendium
             </h1>
             <p className="text-xs text-slate-500">
-              Every recorded US tornado, 1950–2023 · NOAA SPC database
+              Every recorded US tornado, 1950–2026 · NOAA SPC + NCEI Storm Events
             </p>
           </div>
           <div className="text-right text-xs text-slate-500">

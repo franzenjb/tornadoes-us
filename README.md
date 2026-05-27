@@ -1,8 +1,8 @@
 # US Tornado Compendium
 
-Interactive web tool to explore every recorded US tornado from **1950–2023** (≈70,022 events).
+Interactive web tool to explore every recorded US tornado from **1950–2026** (≈73,610 events).
 
-Built from the [NOAA Storm Prediction Center tornado database](https://www.spc.noaa.gov/wcm/#data).
+Built from the [NOAA Storm Prediction Center tornado database](https://www.spc.noaa.gov/wcm/#data) (1950–2025 finalized) plus the [NCEI Storm Events Database](https://www.ncei.noaa.gov/stormevents/) (2026 partial).
 
 ## What it does
 
@@ -67,4 +67,4 @@ Writes `public/data/tornadoes.json`, `tornadoes.json.gz`, and `meta.json`.
 
 ## Source
 
-NOAA / NWS — Storm Prediction Center — Severe Weather Database files (1950–2023).
+NOAA / NWS — Storm Prediction Center — Severe Weather Database files (1950–2026).
