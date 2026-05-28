@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-const EMAIL = "jbf@jbf.com";
+const EMAIL = "jeff.franzen2@redcross.org";
 
 export default function HelpModal({
   open,
