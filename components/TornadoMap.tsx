@@ -1,9 +1,10 @@
 "use client";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import {
   MapContainer,
   TileLayer,
   CircleMarker,
+  Polyline,
   Popup,
   LayersControl,
 } from "react-leaflet";
@@ -97,39 +98,63 @@ export default function TornadoMap({ rows }: { rows: Tornado[] }) {
             const lat = r.slat || r.elat;
             const lon = r.slon || r.elon;
             if (!lat || !lon) return null;
+            const color = EF_COLOR[r.mag] ?? "#94a3b8";
             const radius = r.mag < 0 ? 2 : 2 + r.mag * 1.2;
-            return (
-              <CircleMarker
-                key={r.id}
-                center={[lat, lon]}
-                radius={radius}
-                pathOptions={{
-                  color: EF_COLOR[r.mag] ?? "#94a3b8",
-                  fillColor: EF_COLOR[r.mag] ?? "#94a3b8",
-                  fillOpacity: 0.7,
-                  weight: 1,
-                }}
-              >
-                <Popup>
-                  <div className="text-xs">
-                    <div className="font-semibold">
-                      {magLabel(r.mag)} · {r.yr}-{String(r.mo).padStart(2, "0")}
-                      -{String(r.dy).padStart(2, "0")} {r.tm}
-                    </div>
-                    <div>
-                      {r.st}
-                      {r.co.length ? ` — ${r.co.join(", ")}` : ""}
-                    </div>
-                    <div>
-                      Deaths: <b>{r.fat}</b> · Injuries: <b>{r.inj}</b>
-                    </div>
-                    <div>
-                      Path: {r.len.toFixed(1)} mi, width {r.wid} yd
-                    </div>
-                    {r.loss > 0 && <div>Loss: {humanizeUSD(r.loss)}</div>}
+            const hasPath =
+              r.elat !== 0 &&
+              r.elon !== 0 &&
+              (r.elat !== r.slat || r.elon !== r.slon);
+            const popup = (
+              <Popup>
+                <div className="text-xs">
+                  <div className="font-semibold">
+                    {magLabel(r.mag)} · {r.yr}-{String(r.mo).padStart(2, "0")}-
+                    {String(r.dy).padStart(2, "0")} {r.tm}
                   </div>
-                </Popup>
-              </CircleMarker>
+                  <div>
+                    {r.st}
+                    {r.co.length ? ` — ${r.co.join(", ")}` : ""}
+                  </div>
+                  <div>
+                    Deaths: <b>{r.fat}</b> · Injuries: <b>{r.inj}</b>
+                  </div>
+                  <div>
+                    Path: {r.len.toFixed(1)} mi, width {r.wid} yd
+                  </div>
+                  {r.loss > 0 && <div>Loss: {humanizeUSD(r.loss)}</div>}
+                </div>
+              </Popup>
+            );
+            return (
+              <Fragment key={r.id}>
+                {hasPath && (
+                  <Polyline
+                    positions={[
+                      [r.slat, r.slon],
+                      [r.elat, r.elon],
+                    ]}
+                    pathOptions={{
+                      color,
+                      weight: r.mag >= 3 ? 3 : 2,
+                      opacity: 0.8,
+                    }}
+                  >
+                    {popup}
+                  </Polyline>
+                )}
+                <CircleMarker
+                  center={[lat, lon]}
+                  radius={radius}
+                  pathOptions={{
+                    color,
+                    fillColor: color,
+                    fillOpacity: 0.7,
+                    weight: 1,
+                  }}
+                >
+                  {popup}
+                </CircleMarker>
+              </Fragment>
             );
           })}
         </MapContainer>
