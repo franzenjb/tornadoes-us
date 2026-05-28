@@ -95,6 +95,24 @@ export default function HelpModal({
             </ul>
           </div>
 
+          <div>
+            <h3 className="mb-1 font-semibold text-slate-900">Related</h3>
+            <ul className="list-disc space-y-1 pl-5">
+              <li>
+                Hurricane-spawned tornadoes:{" "}
+                <a
+                  href="https://www.spc.noaa.gov/exper/tctor/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-semibold text-rose-700 underline hover:text-rose-800"
+                >
+                  SPC Tropical Cyclone Tornadoes
+                </a>{" "}
+                — plots tornadoes relative to a storm’s track and center.
+              </li>
+            </ul>
+          </div>
+
           <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3">
             <div className="font-semibold text-slate-900">
               Questions or comments?
