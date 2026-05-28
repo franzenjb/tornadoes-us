@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  /* App is intentionally a light theme. Force light UA rendering so native
+     form controls (inputs/selects/buttons) never inherit the OS dark scheme,
+     which was rendering values/placeholders as illegible light-gray. */
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -12,15 +16,26 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Bulletproof legibility for form controls regardless of OS theme. */
+input,
+select,
+textarea,
+button {
+  color: #0f172a; /* slate-900 */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b; /* slate-500 — visible on white, clearly placeholder */
+  opacity: 1;
 }
