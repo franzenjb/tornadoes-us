@@ -88,7 +88,16 @@ export function ByYearChart({ rows }: { rows: Tornado[] }) {
                   (bucket === 0 ? r.mag < 0 : r.mag === bucket - 1),
               );
               const efLabel = bucket === 0 ? "Unknown EF" : `EF${bucket - 1}`;
-              openDetail(`${year} · ${efLabel}`, sub);
+              const filter =
+                bucket === 0
+                  ? { yearMin: year, yearMax: year }
+                  : {
+                      yearMin: year,
+                      yearMax: year,
+                      magMin: bucket - 1,
+                      magMax: bucket - 1,
+                    };
+              openDetail(`${year} · ${efLabel}`, sub, filter);
             },
             plugins: {
               legend: { position: "bottom", labels: { boxWidth: 12 } },
@@ -137,7 +146,9 @@ export function ByMonthChart({ rows }: { rows: Tornado[] }) {
               if (!els.length) return;
               const mo = els[0].index + 1;
               const sub = rows.filter((r) => r.mo === mo);
-              openDetail(`${MONTHS[mo - 1]} (current selection)`, sub);
+              openDetail(`${MONTHS[mo - 1]} (current selection)`, sub, {
+                months: [mo],
+              });
             },
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } },
@@ -185,7 +196,7 @@ export function ByStateChart({ rows }: { rows: Tornado[] }) {
               if (!els.length) return;
               const st = labels[els[0].index];
               const sub = rows.filter((r) => r.st === st);
-              openDetail(`${st} (current selection)`, sub);
+              openDetail(`${st} (current selection)`, sub, { states: [st] });
             },
             plugins: { legend: { display: false } },
             scales: { y: { beginAtZero: true } },

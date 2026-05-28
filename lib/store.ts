@@ -28,11 +28,19 @@ type DataState = {
   setFilters: (patch: Partial<Filters>) => void;
   resetFilters: () => void;
   load: () => Promise<void>;
+  // Active view tab (shared so the detail drawer can switch views)
+  activeTab: "charts" | "map" | "table" | "findings";
+  setActiveTab: (t: DataState["activeTab"]) => void;
   // Detail drawer (opened by clicking a chart element)
   detailOpen: boolean;
   detailTitle: string;
   detailRows: Tornado[];
-  openDetail: (title: string, rows: Tornado[]) => void;
+  detailFilter?: Partial<Filters>;
+  openDetail: (
+    title: string,
+    rows: Tornado[],
+    filter?: Partial<Filters>,
+  ) => void;
   closeDetail: () => void;
 };
 
@@ -57,11 +65,19 @@ export const useData = create<DataState>((set, get) => ({
     const m = get().meta;
     set({ filters: defaultFilters(m?.yearMin, m?.yearMax) });
   },
+  activeTab: "charts",
+  setActiveTab: (t) => set({ activeTab: t }),
   detailOpen: false,
   detailTitle: "",
   detailRows: [],
-  openDetail: (title, rows) =>
-    set({ detailOpen: true, detailTitle: title, detailRows: rows }),
+  detailFilter: undefined,
+  openDetail: (title, rows, filter) =>
+    set({
+      detailOpen: true,
+      detailTitle: title,
+      detailRows: rows,
+      detailFilter: filter,
+    }),
   closeDetail: () => set({ detailOpen: false }),
   load: async () => {
     if (get().loaded) return;

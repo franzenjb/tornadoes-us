@@ -19,11 +19,11 @@ const TornadoMap = dynamic(() => import("@/components/TornadoMap"), {
 });
 
 export default function Home() {
-  const { loaded, error, records, meta, filters, load } = useData();
+  const { loaded, error, records, meta, filters, load, activeTab, setActiveTab } =
+    useData();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [tab, setTab] = useState<"charts" | "map" | "table" | "findings">(
-    "charts",
-  );
+  const tab = activeTab;
+  const setTab = setActiveTab;
 
   useEffect(() => {
     load();
