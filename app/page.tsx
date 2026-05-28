@@ -7,6 +7,7 @@ import SummaryStats from "@/components/SummaryStats";
 import DataTable from "@/components/DataTable";
 import { ByYearChart, ByMonthChart, ByStateChart } from "@/components/Charts";
 import Findings from "@/components/Findings";
+import DetailPanel from "@/components/DetailPanel";
 
 const TornadoMap = dynamic(() => import("@/components/TornadoMap"), {
   ssr: false,
@@ -155,6 +156,8 @@ export default function Home() {
             </div>
           )}
         </main>
+
+        <DetailPanel />
       </div>
 
       <footer className="border-t border-slate-200 bg-white px-4 py-3 text-center text-xs text-slate-500">

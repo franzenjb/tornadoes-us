@@ -28,6 +28,12 @@ type DataState = {
   setFilters: (patch: Partial<Filters>) => void;
   resetFilters: () => void;
   load: () => Promise<void>;
+  // Detail drawer (opened by clicking a chart element)
+  detailOpen: boolean;
+  detailTitle: string;
+  detailRows: Tornado[];
+  openDetail: (title: string, rows: Tornado[]) => void;
+  closeDetail: () => void;
 };
 
 const defaultFilters = (yMin = 1950, yMax = 2026): Filters => ({
@@ -51,6 +57,12 @@ export const useData = create<DataState>((set, get) => ({
     const m = get().meta;
     set({ filters: defaultFilters(m?.yearMin, m?.yearMax) });
   },
+  detailOpen: false,
+  detailTitle: "",
+  detailRows: [],
+  openDetail: (title, rows) =>
+    set({ detailOpen: true, detailTitle: title, detailRows: rows }),
+  closeDetail: () => set({ detailOpen: false }),
   load: async () => {
     if (get().loaded) return;
     try {
