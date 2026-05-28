@@ -112,26 +112,32 @@ export default function Home() {
 
               <SummaryStats rows={filtered} />
 
-              <div className="flex gap-2 border-b border-slate-200">
-                {(["charts", "map", "table", "findings"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTab(t)}
-                    className={`px-3 py-1.5 text-sm font-medium ${
-                      tab === t
-                        ? "border-b-2 border-rose-600 text-rose-700"
-                        : "text-slate-600 hover:text-slate-900"
-                    }`}
-                  >
-                    {t === "charts"
-                      ? "Charts"
+              <div className="inline-flex w-full flex-wrap gap-1 rounded-lg border border-slate-300 bg-slate-100 p-1 sm:w-auto">
+                {(["charts", "map", "table", "findings"] as const).map((t) => {
+                  const label =
+                    t === "charts"
+                      ? "📊 Charts"
                       : t === "map"
-                        ? "Map"
+                        ? "🗺️ Map"
                         : t === "table"
-                          ? "Table"
-                          : "20 Findings"}
-                  </button>
-                ))}
+                          ? "▦ Table"
+                          : "★ 20 Findings";
+                  const on = tab === t;
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setTab(t)}
+                      aria-pressed={on}
+                      className={`flex-1 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition-colors sm:flex-none ${
+                        on
+                          ? "bg-rose-600 text-white shadow-sm"
+                          : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-rose-50 hover:text-rose-700"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
 
               {tab === "charts" && (
