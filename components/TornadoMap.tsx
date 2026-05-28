@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Tornado } from "@/lib/types";
-import { magLabel } from "@/lib/store";
+import { magLabel, humanizeUSD } from "@/lib/store";
 
 const EF_COLOR: Record<number, string> = {
   [-9]: "#94a3b8",
@@ -92,7 +92,7 @@ export default function TornadoMap({ rows }: { rows: Tornado[] }) {
                     <div>
                       Path: {r.len.toFixed(1)} mi, width {r.wid} yd
                     </div>
-                    {r.loss > 0 && <div>Loss: ${r.loss.toFixed(2)}M</div>}
+                    {r.loss > 0 && <div>Loss: {humanizeUSD(r.loss)}</div>}
                   </div>
                 </Popup>
               </CircleMarker>

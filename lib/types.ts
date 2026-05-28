@@ -8,7 +8,7 @@ export type Tornado = {
   mag: number; // -9 = unknown, 0..5
   inj: number;
   fat: number;
-  loss: number; // millions $
+  loss: number; // actual whole USD (1996+ only; pre-1996 SPC stored a category code, zeroed)
   slat: number;
   slon: number;
   elat: number;

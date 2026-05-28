@@ -61,9 +61,13 @@ def parse_spc(path):
                 slat = float(r["slat"]); slon = float(r["slon"])
                 elat = float(r["elat"]); elon = float(r["elon"])
                 ln = float(r["len"]); wd = float(r["wid"])
-                loss = float(r["loss"] or 0)
+                loss_raw = float(r["loss"] or 0)
             except (ValueError, KeyError):
                 continue
+            # SPC loss units differ by era:
+            #   1950-1995: a 0-9 CATEGORY code, NOT dollars -> drop (untrustworthy as $)
+            #   1996+:     actual whole dollars (this is what the modern file ships)
+            loss = int(round(loss_raw)) if yr >= 1996 else 0
             st = r["st"]; stf = r["stf"]
             counties = []
             for k in ("f1","f2","f3","f4"):
@@ -75,7 +79,7 @@ def parse_spc(path):
                 "tm": (r["time"] or "00:00:00")[:5],
                 "st": st,
                 "mag": mag, "inj": inj, "fat": fat,
-                "loss": round(loss, 2),
+                "loss": loss,
                 "slat": round(slat, 4), "slon": round(slon, 4),
                 "elat": round(elat, 4), "elon": round(elon, 4),
                 "len": round(ln, 2), "wid": int(wd),
@@ -85,15 +89,16 @@ def parse_spc(path):
 
 # ---------- NCEI reader ----------
 def parse_damage(s):
-    if not s: return 0.0
+    """NCEI DAMAGE_PROPERTY like '10.00K' / '1.50M' -> actual whole dollars."""
+    if not s: return 0
     s = s.strip().upper().replace(",", "")
     m = re.match(r"^([0-9.]+)\s*([KMBkmb]?)$", s)
-    if not m: return 0.0
+    if not m: return 0
     val = float(m.group(1)); unit = m.group(2)
     if unit == "K": val *= 1_000
     elif unit == "M": val *= 1_000_000
     elif unit == "B": val *= 1_000_000_000
-    return round(val / 1_000_000, 4)
+    return int(round(val))
 
 def parse_ef(s):
     if not s: return -9
@@ -163,7 +168,7 @@ def parse_ncei(path):
             "tm": tm,
             "st": st,
             "mag": mag, "inj": inj, "fat": fat,
-            "loss": round(loss, 2),
+            "loss": int(round(loss)),
             "slat": round(slat, 4), "slon": round(slon, 4),
             "elat": round(elat, 4), "elon": round(elon, 4),
             "len": round(length, 2), "wid": width,

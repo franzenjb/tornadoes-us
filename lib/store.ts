@@ -104,3 +104,12 @@ export function magLabel(m: number): string {
   if (m < 0) return "Unk";
   return `EF${m}`;
 }
+
+/** Whole-dollar amount -> compact, rounded string ($11.5B, $250.0M, $50K, $0). */
+export function humanizeUSD(dollars: number): string {
+  if (!dollars || dollars <= 0) return "$0";
+  if (dollars >= 1_000_000_000) return `$${(dollars / 1_000_000_000).toFixed(1)}B`;
+  if (dollars >= 1_000_000) return `$${(dollars / 1_000_000).toFixed(1)}M`;
+  if (dollars >= 1_000) return `$${Math.round(dollars / 1_000)}K`;
+  return `$${dollars}`;
+}

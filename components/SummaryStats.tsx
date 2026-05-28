@@ -1,5 +1,6 @@
 "use client";
 import type { Tornado } from "@/lib/types";
+import { humanizeUSD } from "@/lib/store";
 
 function fmt(n: number) {
   return n.toLocaleString();
@@ -30,8 +31,8 @@ export default function SummaryStats({ rows }: { rows: Tornado[] }) {
     },
     {
       label: "Property loss",
-      value: `$${fmt(Math.round(loss))}M`,
-      sub: "reported",
+      value: humanizeUSD(loss),
+      sub: "reported, 1996+",
     },
   ];
   return (

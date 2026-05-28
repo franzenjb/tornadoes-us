@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import type { Tornado } from "@/lib/types";
-import { magLabel } from "@/lib/store";
+import { magLabel, humanizeUSD } from "@/lib/store";
 
 type Col = {
   key: keyof Tornado | "date" | "county";
@@ -65,9 +65,9 @@ const COLS: Col[] = [
   },
   {
     key: "loss",
-    label: "Loss ($M)",
+    label: "Property loss",
     align: "right",
-    fmt: (r) => (r.loss ? r.loss.toFixed(2) : "—"),
+    fmt: (r) => (r.loss ? humanizeUSD(r.loss) : "—"),
     sort: (a, b) => a.loss - b.loss,
   },
 ];
@@ -178,7 +178,7 @@ export default function DataTable({ rows }: { rows: Tornado[] }) {
 function downloadCsv(rows: Tornado[]) {
   const header = [
     "id","date","time","state","county","ef","deaths","injuries",
-    "loss_M_USD","length_mi","width_yd","start_lat","start_lon","end_lat","end_lon",
+    "property_loss_usd","length_mi","width_yd","start_lat","start_lon","end_lat","end_lon",
   ];
   const lines = [header.join(",")];
   for (const r of rows) {
