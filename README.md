@@ -51,12 +51,21 @@ npm run build    # production build
 ## Rebuilding the dataset
 
 ```bash
-cd data-build
-curl -sSL -o spc-raw.csv "https://www.spc.noaa.gov/wcm/data/<latest>_actual_tornadoes.csv"
-python3 build.py
+python3 data-build/fetch.py   # download latest SPC + NCEI source files
+python3 data-build/build.py   # rebuild public/data/*.json
 ```
 
-Writes `public/data/tornadoes.json`, `tornadoes.json.gz`, and `meta.json`.
+`fetch.py` auto-discovers the newest SPC base (`1950-YYYY`), SPC current-year
+(`YYYY_torn.csv`), and NCEI current-year details file. `build.py` finds sources
+by glob, so neither needs editing as years roll over.
+
+## Auto-update
+
+`.github/workflows/update-data.yml` runs every Monday (and on-demand via the
+Actions tab). It fetches the latest source files, rebuilds the JSON, and commits
+only if the data changed. The repo is connected to Vercel, so each data commit
+auto-deploys. Manual trigger: GitHub → Actions → "Update tornado data" → Run
+workflow.
 
 ## Data caveats
 

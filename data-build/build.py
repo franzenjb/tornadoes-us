@@ -6,16 +6,31 @@ Sources, in priority (later wins for overlapping years):
   2. SPC 2025 standalone (full yr) -> data-build/spc-2025.csv         (overrides #1's partial 2025)
   3. NCEI Storm Events 2026         -> data-build/ncei-2026.csv.gz    (fills 2026 partial)
 """
-import csv, gzip, json, re
+import csv, glob, gzip, json, re
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SPC_BASE = HERE / "spc-1950-2025.csv"
-SPC_2025 = HERE / "spc-2025.csv"
-NCEI_2026 = HERE / "ncei-2026.csv.gz"
 CTY = HERE / "counties.csv"
 OUT_DIR = HERE.parent / "public" / "data"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
+
+def _newest(pattern, exclude=None):
+    """Newest file (by name, so highest year/compile-date) matching a glob."""
+    hits = sorted(glob.glob(str(HERE / pattern)))
+    if exclude:
+        hits = [h for h in hits if Path(h).name not in exclude]
+    return Path(hits[-1]) if hits else None
+
+# Year-agnostic source discovery so the weekly auto-update never needs code edits:
+#   base     = the multi-decade SPC file, e.g. spc-1950-2025.csv  (or fetch.py's spc-base.csv)
+#   current  = SPC single-year file, e.g. spc-2025.csv / spc-current.csv
+#   ncei     = latest NCEI current-year details, e.g. ncei-2026.csv.gz / ncei-current.csv.gz
+SPC_BASE = (HERE / "spc-base.csv") if (HERE / "spc-base.csv").exists() else _newest("spc-1950-*.csv")
+SPC_CURR = (HERE / "spc-current.csv") if (HERE / "spc-current.csv").exists() else _newest("spc-[12][0-9][0-9][0-9].csv")
+NCEI_CURR = (HERE / "ncei-current.csv.gz") if (HERE / "ncei-current.csv.gz").exists() else _newest("ncei-*.csv.gz")
+
+if not SPC_BASE:
+    raise SystemExit("No SPC base file found (expected spc-base.csv or spc-1950-*.csv)")
 
 # ---------- FIPS lookup ----------
 fips = {}
@@ -178,14 +193,26 @@ def parse_ncei(path):
 
 # ---------- Merge ----------
 base = parse_spc(SPC_BASE)
-print(f"SPC base 1950-2025:  {len(base):,}")
-spc_2025 = parse_spc(SPC_2025) if SPC_2025.exists() else []
-print(f"SPC 2025 standalone: {len(spc_2025):,}")
-ncei_2026 = parse_ncei(NCEI_2026) if NCEI_2026.exists() else []
-print(f"NCEI 2026:           {len(ncei_2026):,}")
+print(f"SPC base ({SPC_BASE.name}):  {len(base):,}")
 
-base_filtered = [r for r in base if r["yr"] != 2025] if spc_2025 else base
-records = base_filtered + spc_2025 + ncei_2026
+spc_curr = parse_spc(SPC_CURR) if SPC_CURR else []
+curr_year = max((r["yr"] for r in spc_curr), default=None)
+print(f"SPC current ({SPC_CURR.name if SPC_CURR else '-'}): {len(spc_curr):,}"
+      + (f" [year {curr_year}]" if curr_year else ""))
+
+ncei_curr = parse_ncei(NCEI_CURR) if NCEI_CURR else []
+ncei_year = max((r["yr"] for r in ncei_curr), default=None)
+print(f"NCEI current ({NCEI_CURR.name if NCEI_CURR else '-'}): {len(ncei_curr):,}"
+      + (f" [year {ncei_year}]" if ncei_year else ""))
+
+# Drop the years we have better single-year sources for, then append them.
+override_years = set()
+if curr_year:
+    override_years.add(curr_year)
+if ncei_year:
+    override_years.add(ncei_year)
+base_filtered = [r for r in base if r["yr"] not in override_years]
+records = base_filtered + spc_curr + ncei_curr
 
 records.sort(key=lambda r: (r["yr"], r["mo"], r["dy"], r["tm"], r["st"]))
 for i, r in enumerate(records, 1):
@@ -207,13 +234,14 @@ meta = {
     "yearMin": years[0], "yearMax": years[-1],
     "states": states,
     "stateCounties": {s: sorted(cs) for s, cs in state_county.items()},
-    "source": "NOAA SPC (1950-2025) + NCEI Storm Events (2026)",
+    "source": f"NOAA SPC (1950-{years[-1]}) + NCEI Storm Events",
     "url": "https://www.spc.noaa.gov/wcm/#data",
     "buildSources": {
-        "spc_base":  "1950-2025_actual_tornadoes.csv",
-        "spc_2025":  "2025_torn.csv",
-        "ncei_2026": "StormEvents_details-ftp_v1.0_d2026 (NCEI)",
+        "spc_base": SPC_BASE.name,
+        "spc_current": SPC_CURR.name if SPC_CURR else None,
+        "ncei_current": NCEI_CURR.name if NCEI_CURR else None,
     },
+    "buildDate": __import__("datetime").date.today().isoformat(),
 }
 with open(OUT_DIR / "meta.json", "w") as f:
     json.dump(meta, f, separators=(",", ":"))

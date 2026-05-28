@@ -47,3 +47,8 @@ public/data/*.gz
 data-build/spc-1950-2025.csv
 data-build/spc-2025.csv
 data-build/ncei-2026.csv.gz
+
+# Auto-update generic source files (downloaded by data-build/fetch.py)
+data-build/spc-base.csv
+data-build/spc-current.csv
+data-build/ncei-current.csv.gz

@@ -1,0 +1,50 @@
+name: Update tornado data
+
+# Weekly refresh of the SPC + NCEI source data. Re-downloads the latest files,
+# rebuilds public/data/*.json, and commits only if something changed. The repo
+# is connected to Vercel, so a push to main auto-deploys the new data.
+
+on:
+  schedule:
+    - cron: "0 12 * * 1" # Mondays 12:00 UTC
+  workflow_dispatch: {} # allow manual "Run workflow" from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch latest source files
+        run: python data-build/fetch.py
+
+      - name: Rebuild dataset
+        run: python data-build/build.py
+
+      - name: Commit if data changed
+        run: |
+          git config user.name "tornado-data-bot"
+          git config user.email "actions@github.com"
+          git add public/data/tornadoes.json public/data/meta.json
+          if git diff --cached --quiet; then
+            echo "No data changes — nothing to commit."
+          else
+            COUNT=$(python -c "import json;print(json.load(open('public/data/meta.json'))['count'])")
+            RANGE=$(python -c "import json;m=json.load(open('public/data/meta.json'));print(f\"{m['yearMin']}-{m['yearMax']}\")")
+            git commit -m "Auto-update tornado data: ${COUNT} events (${RANGE})"
+            git push
+            echo "Pushed updated data (${COUNT} events, ${RANGE})."
+          fi
