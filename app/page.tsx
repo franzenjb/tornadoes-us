@@ -6,6 +6,7 @@ import FilterPanel from "@/components/FilterPanel";
 import SummaryStats from "@/components/SummaryStats";
 import DataTable from "@/components/DataTable";
 import { ByYearChart, ByMonthChart, ByStateChart } from "@/components/Charts";
+import Findings from "@/components/Findings";
 
 const TornadoMap = dynamic(() => import("@/components/TornadoMap"), {
   ssr: false,
@@ -19,7 +20,9 @@ const TornadoMap = dynamic(() => import("@/components/TornadoMap"), {
 export default function Home() {
   const { loaded, error, records, meta, filters, load } = useData();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [tab, setTab] = useState<"charts" | "map" | "table">("charts");
+  const [tab, setTab] = useState<"charts" | "map" | "table" | "findings">(
+    "charts",
+  );
 
   useEffect(() => {
     load();
@@ -110,7 +113,7 @@ export default function Home() {
               <SummaryStats rows={filtered} />
 
               <div className="flex gap-2 border-b border-slate-200">
-                {(["charts", "map", "table"] as const).map((t) => (
+                {(["charts", "map", "table", "findings"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
@@ -120,7 +123,13 @@ export default function Home() {
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    {t === "charts" ? "Charts" : t === "map" ? "Map" : "Table"}
+                    {t === "charts"
+                      ? "Charts"
+                      : t === "map"
+                        ? "Map"
+                        : t === "table"
+                          ? "Table"
+                          : "20 Findings"}
                   </button>
                 ))}
               </div>
@@ -136,6 +145,7 @@ export default function Home() {
               )}
               {tab === "map" && <TornadoMap rows={filtered} />}
               {tab === "table" && <DataTable rows={filtered} />}
+              {tab === "findings" && <Findings records={records} />}
             </div>
           )}
         </main>
