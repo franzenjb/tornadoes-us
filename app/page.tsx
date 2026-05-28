@@ -8,6 +8,7 @@ import DataTable from "@/components/DataTable";
 import { ByYearChart, ByMonthChart, ByStateChart } from "@/components/Charts";
 import Findings from "@/components/Findings";
 import DetailPanel from "@/components/DetailPanel";
+import HelpModal from "@/components/HelpModal";
 
 const TornadoMap = dynamic(() => import("@/components/TornadoMap"), {
   ssr: false,
@@ -22,6 +23,7 @@ export default function Home() {
   const { loaded, error, records, meta, filters, load, activeTab, setActiveTab } =
     useData();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [helpOpen, setHelpOpen] = useState(false);
   const tab = activeTab;
   const setTab = setActiveTab;
 
@@ -51,28 +53,38 @@ export default function Home() {
               Every recorded US tornado, 1950–2026 · NOAA SPC + NCEI Storm Events
             </p>
           </div>
-          <div className="text-right text-xs text-slate-500">
-            {meta && (
-              <>
-                <div>
-                  <span className="font-semibold text-slate-700">
-                    {meta.count.toLocaleString()}
-                  </span>{" "}
-                  total events
-                </div>
-                <a
-                  href={meta.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-rose-600 hover:underline"
-                >
-                  source: SPC
-                </a>
-              </>
-            )}
+          <div className="flex items-center gap-3">
+            <div className="text-right text-xs text-slate-500">
+              {meta && (
+                <>
+                  <div>
+                    <span className="font-semibold text-slate-700">
+                      {meta.count.toLocaleString()}
+                    </span>{" "}
+                    total events
+                  </div>
+                  <a
+                    href={meta.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-rose-600 hover:underline"
+                  >
+                    source: SPC
+                  </a>
+                </>
+              )}
+            </div>
+            <button
+              onClick={() => setHelpOpen(true)}
+              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 hover:border-rose-400 hover:bg-rose-50 hover:text-rose-700"
+              title="About / help / contact"
+            >
+              ? Help
+            </button>
           </div>
         </div>
       </header>
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
       <div className="flex flex-1">
         <aside

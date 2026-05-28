@@ -1,6 +1,12 @@
 "use client";
 import { useMemo } from "react";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  Popup,
+  LayersControl,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Tornado } from "@/lib/types";
 import { magLabel, humanizeUSD } from "@/lib/store";
@@ -55,10 +61,38 @@ export default function TornadoMap({ rows }: { rows: Tornado[] }) {
           style={{ height: "100%", width: "100%" }}
           scrollWheelZoom
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <LayersControl position="bottomright">
+            <LayersControl.BaseLayer checked name="Light (Carto)">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="Streets (OSM)">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="Satellite (Esri)">
+              <TileLayer
+                attribution="Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="Topographic (Esri)">
+              <TileLayer
+                attribution="Tiles &copy; Esri — Esri, DeLorme, NAVTEQ, USGS"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="Dark (Carto)">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              />
+            </LayersControl.BaseLayer>
+          </LayersControl>
           {sample.map((r) => {
             const lat = r.slat || r.elat;
             const lon = r.slon || r.elon;
